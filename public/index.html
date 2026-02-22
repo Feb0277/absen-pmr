@@ -2,216 +2,302 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Absen PMR</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:Arial; background:#e8e8e8; padding:20px; }
+    body { font-family:Arial; background:#f0f4f8; color:#222; }
 
-    .container { max-width:750px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+    /* HEADER */
+    .header {
+      background: #4472c4;
+      color: #fff;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .header h1 { font-size: 18px; }
+    .header p  { font-size: 11px; opacity: 0.8; margin-top: 2px; }
 
-    h2 { text-align:center; color:#4472c4; margin-bottom:4px; }
-    .subtitle { text-align:center; font-size:11px; color:#888; margin-bottom:8px; }
+    /* NAV TAB */
+    .nav {
+      display: flex;
+      background: #2f5496;
+    }
+    .nav button {
+      flex: 1; padding: 12px 4px;
+      background: none; border: none;
+      color: #fff; font-size: 12px;
+      font-weight: bold; cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: 0.2s;
+    }
+    .nav button.active { border-bottom: 3px solid #fff; background: rgba(255,255,255,0.1); }
 
+    /* HALAMAN */
+    .page { display: none; padding: 16px; max-width: 600px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* CARD */
     .card {
-      background:#fff; padding:20px; border-radius:8px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      background: #fff; border-radius: 10px;
+      padding: 16px; margin-bottom: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
     }
-    .card h3 {
-      font-size:13px; color:#333; margin-bottom:12px;
-      border-bottom:2px solid #4472c4; padding-bottom:6px;
-    }
+    .card h3 { font-size: 13px; color: #4472c4; margin-bottom: 12px; }
 
     label { display:block; font-size:11px; font-weight:bold; color:#555; margin-top:10px; }
-    input {
-      width:100%; padding:7px 9px; margin-top:3px;
-      border:1px solid #ccc; border-radius:4px; font-size:12px;
+    input, select {
+      width:100%; padding:10px; margin-top:4px;
+      border:1px solid #ddd; border-radius:8px;
+      font-size:13px; background:#fafafa;
     }
-    input:focus { outline:none; border-color:#4472c4; }
+    input:focus { outline:none; border-color:#4472c4; background:#fff; }
 
-    .row { display:flex; gap:8px; }
-    .row > div { flex:1; }
-
+    /* TOMBOL */
     .btn {
-      padding:8px 16px; border:none; border-radius:5px;
-      font-size:12px; font-weight:bold; cursor:pointer; margin-top:10px;
+      width:100%; padding:13px; border:none;
+      border-radius:8px; font-size:14px;
+      font-weight:bold; cursor:pointer;
+      margin-top:12px; transition:0.2s;
     }
-    .btn-blue  { background:#4472c4; color:#fff; width:100%; padding:11px; font-size:13px; }
+    .btn-blue  { background:#4472c4; color:#fff; }
     .btn-blue:hover  { background:#2f5496; }
     .btn-green { background:#375623; color:#fff; }
     .btn-green:hover { background:#1f3714; }
-    .btn-red   { background:#c00000; color:#fff; font-size:11px; padding:4px 9px; margin:0; }
-    .btn-red:hover   { background:#8b0000; }
-    .btn-gray  { background:#555; color:#fff; font-size:11px; padding:4px 9px; margin:0; }
-    .btn-gray:hover  { background:#333; }
-    .btn-save  { background:#7b3f00; color:#fff; font-size:11px; padding:4px 9px; margin:0; }
-    .btn-save:hover  { background:#5a2d00; }
     .btn:disabled { background:#aaa !important; cursor:not-allowed; }
 
-    /* Tabel */
-    table { width:100%; border-collapse:collapse; font-size:11px; margin-top:12px; }
-    th { background:#4472c4; color:#fff; padding:6px 8px; text-align:center; border:1px solid #2f5496; }
-    td { border:1px solid #ddd; padding:5px 7px; text-align:center; vertical-align:middle; }
-    td.td-nama { text-align:left; }
-    td input {
-      border:1px dashed #aaa; background:#fffde7;
-      padding:3px 5px; font-size:11px; width:100%; margin:0;
+    /* STATUS */
+    .status {
+      text-align:center; font-size:12px;
+      font-weight:bold; margin-top:10px;
+      min-height:18px; padding:4px;
+      border-radius:6px;
     }
-    tr:nth-child(even) td { background:#f5f8ff; }
-    tr:nth-child(even) td input { background:#fff9c4; }
+    .ok  { color:#375623; background:#f0faf0; }
+    .err { color:#c00000; background:#fff0f0; }
 
-    .aksi-btn { display:flex; gap:4px; justify-content:center; }
-
-    .status { font-size:11px; margin-top:8px; text-align:center; min-height:16px; font-weight:bold; }
-    .ok  { color:#375623; }
-    .err { color:#c00000; }
-
-    .tgl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px; }
-
-    .info-total {
-      font-size:11px; color:#555; text-align:right;
-      margin-top:6px; font-style:italic;
+    /* SUMBER DATA */
+    .sumber-btn {
+      display: flex; gap: 8px; margin-top: 8px;
     }
+    .sumber-btn button {
+      flex:1; padding:10px; border-radius:8px;
+      border: 2px solid #ddd; background:#fafafa;
+      font-size:12px; font-weight:bold; cursor:pointer;
+      transition:0.2s; color:#555;
+    }
+    .sumber-btn button.active {
+      border-color:#4472c4; background:#eef2ff; color:#4472c4;
+    }
+
+    /* TANGGAL GRID */
+    .tgl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; }
+
+    /* DAFTAR SISWA */
+    .siswa-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px; border:1px solid #eee;
+      border-radius:8px; margin-bottom:8px;
+      background:#fafafa;
+    }
+    .siswa-info { flex:1; }
+    .siswa-nama { font-size:13px; font-weight:bold; color:#222; }
+    .siswa-sub  { font-size:11px; color:#888; margin-top:2px; }
+    .siswa-aksi { display:flex; gap:6px; }
+    .btn-sm {
+      padding:6px 10px; border:none; border-radius:6px;
+      font-size:11px; font-weight:bold; cursor:pointer;
+    }
+    .btn-edit { background:#e8edf8; color:#4472c4; }
+    .btn-del  { background:#ffe8e8; color:#c00000; }
+
+    /* FORM TAMBAH */
+    .form-tambah { border-top:1px solid #eee; margin-top:14px; padding-top:14px; }
+    .form-tambah h4 { font-size:12px; color:#555; margin-bottom:4px; }
+
+    /* LOADING */
+    .loading {
+      text-align:center; padding:20px;
+      color:#888; font-size:12px;
+    }
+
+    /* MODAL EDIT */
+    .modal-bg {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.5); z-index:100;
+      align-items:center; justify-content:center;
+    }
+    .modal-bg.show { display:flex; }
+    .modal {
+      background:#fff; border-radius:12px;
+      padding:20px; width:90%; max-width:400px;
+    }
+    .modal h3 { font-size:14px; color:#4472c4; margin-bottom:12px; }
+    .modal-aksi { display:flex; gap:8px; margin-top:12px; }
+    .modal-aksi button {
+      flex:1; padding:10px; border:none;
+      border-radius:8px; font-size:13px;
+      font-weight:bold; cursor:pointer;
+    }
+    .btn-simpan { background:#4472c4; color:#fff; }
+    .btn-batal  { background:#eee; color:#555; }
   </style>
 </head>
 <body>
-<div class="container">
 
-  <div>
-    <h2>📋 Sistem Absensi PMR</h2>
-    <p class="subtitle">SMK Negeri 1 Stabat</p>
-  </div>
+<!-- HEADER -->
+<div class="header">
+  <h1>📋 Sistem Absensi PMR</h1>
+  <p>SMK Negeri 1 Stabat</p>
+</div>
 
-  <!-- CARD: DATA SISWA -->
+<!-- NAV -->
+<div class="nav">
+  <button class="active" onclick="gotoTab('tabPDF', this)">📄 Generate PDF</button>
+  <button onclick="gotoTab('tabSiswa', this)">👥 Data Siswa</button>
+</div>
+
+<!-- ===== TAB 1: GENERATE PDF ===== -->
+<div class="page active" id="tabPDF">
+
   <div class="card">
-    <h3>👥 Data Siswa</h3>
-
-    <div class="row">
-      <div>
-        <label>NISN</label>
-        <input type="text" id="inNisn" placeholder="contoh: 0101234567">
-      </div>
-      <div style="flex:2">
-        <label>Nama Lengkap</label>
-        <input type="text" id="inNama" placeholder="contoh: BUDI SANTOSO">
-      </div>
-      <div>
-        <label>Kelas</label>
-        <input type="text" id="inKelas" placeholder="contoh: X DPIB 1">
-      </div>
-    </div>
-    <button class="btn btn-green" onclick="tambahSiswa()">＋ Tambah Siswa</button>
-    <p class="status ok" id="statusSiswa"></p>
-
-    <table>
-      <thead>
-        <tr>
-          <th style="width:5%">NO</th>
-          <th style="width:15%">NISN</th>
-          <th>NAMA</th>
-          <th style="width:13%">KELAS</th>
-          <th style="width:20%">AKSI</th>
-        </tr>
-      </thead>
-      <tbody id="tbodySiswa"></tbody>
-    </table>
-    <p class="info-total" id="totalSiswa"></p>
-  </div>
-
-  <!-- CARD: GENERATE PDF -->
-  <div class="card">
-    <h3>📄 Generate PDF Daftar Hadir</h3>
+    <h3>⚙️ Pengaturan</h3>
 
     <label>Nama Pelatih</label>
     <input type="text" id="pelatih" value="Susianto">
 
     <label>Tahun Pelajaran</label>
     <input type="text" id="tahun" value="2025-2026">
+  </div>
 
-    <label>Tanggal Pertemuan (isi yang diperlukan saja)</label>
+  <div class="card">
+    <h3>📅 Tanggal Pertemuan</h3>
     <div class="tgl-grid">
-      <input type="date" id="tgl1">
-      <input type="date" id="tgl2">
-      <input type="date" id="tgl3">
-      <input type="date" id="tgl4">
+      <div><label>Pertemuan 1</label><input type="date" id="tgl1"></div>
+      <div><label>Pertemuan 2</label><input type="date" id="tgl2"></div>
+      <div><label>Pertemuan 3</label><input type="date" id="tgl3"></div>
+      <div><label>Pertemuan 4</label><input type="date" id="tgl4"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>👥 Sumber Data Siswa</h3>
+    <div class="sumber-btn">
+      <button id="btnDariServer" class="active" onclick="pilihSumber('server')">
+        🗄️ Dari Database
+      </button>
+      <button id="btnManual" onclick="pilihSumber('manual')">
+        ✏️ Input Manual
+      </button>
     </div>
 
-    <button class="btn btn-blue" id="btnPDF" onclick="downloadPDF()">
-      ⬇️ Download PDF Daftar Hadir
-    </button>
-    <p class="status" id="statusPDF"></p>
+    <!-- Manual input (tersembunyi by default) -->
+    <div id="inputManual" style="display:none; margin-top:12px;">
+      <p style="font-size:11px; color:#888; margin-bottom:8px;">
+        Ketik NISN, Nama, Kelas — satu siswa per baris, pisahkan dengan koma.<br>
+        Contoh: <code>0106524645, BUDI SANTOSO, X DPIB 1</code>
+      </p>
+      <textarea id="txtManual" rows="6"
+        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:12px;resize:vertical;"
+        placeholder="0106524645, BUDI SANTOSO, X DPIB 1&#10;0104302847, SITI RAHAYU, X DPIB 2"></textarea>
+    </div>
+  </div>
+
+  <button class="btn btn-blue" id="btnDownload" onclick="downloadPDF()">
+    ⬇️ Download PDF Daftar Hadir
+  </button>
+  <p class="status" id="statusPDF"></p>
+
+</div>
+
+<!-- ===== TAB 2: DATA SISWA ===== -->
+<div class="page" id="tabSiswa">
+
+  <div class="card">
+    <h3>👥 Daftar Siswa</h3>
+    <div id="listSiswa"><div class="loading">⏳ Memuat data...</div></div>
+    <p style="font-size:11px;color:#888;text-align:right;margin-top:6px;" id="totalSiswa"></p>
+
+    <!-- Form tambah -->
+    <div class="form-tambah">
+      <h4>＋ Tambah Siswa Baru</h4>
+      <label>NISN</label>
+      <input type="text" id="inNisn" placeholder="contoh: 0101234567">
+      <label>Nama Lengkap</label>
+      <input type="text" id="inNama" placeholder="contoh: BUDI SANTOSO">
+      <label>Kelas</label>
+      <input type="text" id="inKelas" placeholder="contoh: X DPIB 1">
+      <button class="btn btn-green" onclick="tambahSiswa()">＋ Tambah Siswa</button>
+      <p class="status" id="statusSiswa"></p>
+    </div>
   </div>
 
 </div>
 
+<!-- MODAL EDIT -->
+<div class="modal-bg" id="modalEdit">
+  <div class="modal">
+    <h3>✏️ Edit Data Siswa</h3>
+    <input type="hidden" id="editNisn">
+    <label>Nama</label>
+    <input type="text" id="editNama">
+    <label>Kelas</label>
+    <input type="text" id="editKelas">
+    <div class="modal-aksi">
+      <button class="btn-batal"  onclick="tutupModal()">Batal</button>
+      <button class="btn-simpan" onclick="simpanEdit()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  // ===== LOAD TABEL SISWA =====
+  let sumberData = 'server';
+
+  // ===== TAB NAVIGATION =====
+  function gotoTab(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'tabSiswa') loadSiswa();
+  }
+
+  // ===== PILIH SUMBER DATA =====
+  function pilihSumber(mode) {
+    sumberData = mode;
+    document.getElementById('btnDariServer').classList.toggle('active', mode === 'server');
+    document.getElementById('btnManual').classList.toggle('active', mode === 'manual');
+    document.getElementById('inputManual').style.display = mode === 'manual' ? 'block' : 'none';
+  }
+
+  // ===== LOAD SISWA =====
   async function loadSiswa() {
-    const res  = await fetch('/api/siswa');
-    const data = await res.json();
-    const tb   = document.getElementById('tbodySiswa');
-    tb.innerHTML = '';
+    const list = document.getElementById('listSiswa');
+    list.innerHTML = '<div class="loading">⏳ Memuat data...</div>';
+    try {
+      const res  = await fetch('/api/siswa');
+      const data = await res.json();
+      document.getElementById('totalSiswa').textContent = `Total: ${data.length} siswa`;
 
-    data.forEach((s, i) => {
-      tb.innerHTML += `
-        <tr id="row-${s.nisn}">
-          <td>${i + 1}</td>
-          <td>${s.nisn}</td>
-          <td class="td-nama" id="nama-${s.nisn}">${s.nama}</td>
-          <td id="kelas-${s.nisn}">${s.kelas}</td>
-          <td>
-            <div class="aksi-btn">
-              <button class="btn btn-gray" onclick="editMode('${s.nisn}','${s.nama}','${s.kelas}')">✏️</button>
-              <button class="btn btn-red"  onclick="hapusSiswa('${s.nisn}')">✕</button>
-            </div>
-          </td>
-        </tr>`;
-    });
+      if (data.length === 0) {
+        list.innerHTML = '<div class="loading">Belum ada data siswa.</div>';
+        return;
+      }
 
-    document.getElementById('totalSiswa').textContent =
-      `Total: ${data.length} siswa terdaftar`;
-  }
-
-  // ===== MODE EDIT =====
-  function editMode(nisn, nama, kelas) {
-    document.getElementById(`nama-${nisn}`).innerHTML =
-      `<input type="text" id="edit-nama-${nisn}" value="${nama}">`;
-    document.getElementById(`kelas-${nisn}`).innerHTML =
-      `<input type="text" id="edit-kelas-${nisn}" value="${kelas}" style="width:80px">`;
-
-    // Ganti tombol aksi
-    const aksi = document.querySelector(`#row-${nisn} .aksi-btn`);
-    aksi.innerHTML = `
-      <button class="btn btn-save" onclick="simpanEdit('${nisn}')">💾</button>
-      <button class="btn btn-gray" onclick="loadSiswa()">✕</button>
-    `;
-  }
-
-  // ===== SIMPAN EDIT =====
-  async function simpanEdit(nisn) {
-    const nama  = document.getElementById(`edit-nama-${nisn}`).value.trim();
-    const kelas = document.getElementById(`edit-kelas-${nisn}`).value.trim();
-    const status = document.getElementById('statusSiswa');
-
-    if (!nama || !kelas) {
-      status.className = 'status err';
-      status.textContent = '❌ Nama dan Kelas tidak boleh kosong!';
-      return;
-    }
-
-    const res  = await fetch(`/api/siswa/${nisn}`, {
-      method : 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({ nama, kelas })
-    });
-    const data = await res.json();
-
-    if (res.ok) {
-      status.className = 'status ok';
-      status.textContent = '✅ ' + data.pesan;
-      loadSiswa();
-    } else {
-      status.className = 'status err';
-      status.textContent = '❌ ' + data.error;
+      list.innerHTML = data.map(s => `
+        <div class="siswa-item">
+          <div class="siswa-info">
+            <div class="siswa-nama">${s.nama}</div>
+            <div class="siswa-sub">${s.nisn} &bull; ${s.kelas}</div>
+          </div>
+          <div class="siswa-aksi">
+            <button class="btn-sm btn-edit" onclick="bukaEdit('${s.nisn}','${s.nama}','${s.kelas}')">✏️</button>
+            <button class="btn-sm btn-del"  onclick="hapusSiswa('${s.nisn}')">✕</button>
+          </div>
+        </div>
+      `).join('');
+    } catch(e) {
+      list.innerHTML = '<div class="loading">❌ Gagal memuat data.</div>';
     }
   }
 
@@ -250,11 +336,46 @@
 
   // ===== HAPUS SISWA =====
   async function hapusSiswa(nisn) {
-    if (!confirm('Hapus siswa dengan NISN ' + nisn + '?')) return;
+    if (!confirm('Hapus siswa ini?')) return;
     const res  = await fetch('/api/siswa/' + nisn, { method: 'DELETE' });
     const data = await res.json();
     const status = document.getElementById('statusSiswa');
+    if (res.ok) {
+      status.className = 'status ok';
+      status.textContent = '✅ ' + data.pesan;
+      loadSiswa();
+    } else {
+      status.className = 'status err';
+      status.textContent = '❌ ' + data.error;
+    }
+  }
 
+  // ===== MODAL EDIT =====
+  function bukaEdit(nisn, nama, kelas) {
+    document.getElementById('editNisn').value  = nisn;
+    document.getElementById('editNama').value  = nama;
+    document.getElementById('editKelas').value = kelas;
+    document.getElementById('modalEdit').classList.add('show');
+  }
+
+  function tutupModal() {
+    document.getElementById('modalEdit').classList.remove('show');
+  }
+
+  async function simpanEdit() {
+    const nisn  = document.getElementById('editNisn').value;
+    const nama  = document.getElementById('editNama').value.trim();
+    const kelas = document.getElementById('editKelas').value.trim();
+    const status = document.getElementById('statusSiswa');
+
+    const res  = await fetch(`/api/siswa/${nisn}`, {
+      method : 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ nama, kelas })
+    });
+    const data = await res.json();
+
+    tutupModal();
     if (res.ok) {
       status.className = 'status ok';
       status.textContent = '✅ ' + data.pesan;
@@ -267,7 +388,7 @@
 
   // ===== DOWNLOAD PDF =====
   async function downloadPDF() {
-    const btn    = document.getElementById('btnPDF');
+    const btn    = document.getElementById('btnDownload');
     const status = document.getElementById('statusPDF');
     btn.disabled = true;
     status.className = 'status';
@@ -284,14 +405,33 @@
       return;
     }
 
+    // Siapkan data siswa manual jika dipilih
+    let siswaManual = [];
+    if (sumberData === 'manual') {
+      const baris = document.getElementById('txtManual').value.trim().split('\n');
+      siswaManual = baris.map(b => {
+        const [nisn, nama, kelas] = b.split(',').map(s => s.trim());
+        return { nisn, nama, kelas };
+      }).filter(s => s.nisn && s.nama && s.kelas);
+
+      if (siswaManual.length === 0) {
+        status.className = 'status err';
+        status.textContent = '❌ Data manual tidak valid!';
+        btn.disabled = false;
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/generate-pdf', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify({
-          pelatih: document.getElementById('pelatih').value,
-          tahun  : document.getElementById('tahun').value,
-          tanggal
+          pelatih     : document.getElementById('pelatih').value,
+          tahun       : document.getElementById('tahun').value,
+          tanggal,
+          sumber      : sumberData,
+          siswaManual
         })
       });
 
@@ -309,13 +449,11 @@
       status.textContent = '✅ PDF berhasil didownload!';
     } catch(e) {
       status.className = 'status err';
-      status.textContent = '❌ Gagal membuat PDF, cek CMD.';
+      status.textContent = '❌ Gagal membuat PDF.';
     }
 
     btn.disabled = false;
   }
-
-  loadSiswa();
 </script>
 </body>
 </html>

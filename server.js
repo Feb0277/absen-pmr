@@ -85,7 +85,9 @@ app.put('/api/siswa/:nisn', (req, res) => {
 app.post('/generate-pdf', async (req, res) => {
   try {
     const { pelatih, tahun, tanggal } = req.body;
-    const dataSiswa = bacaSiswa();
+    const dataSiswa = (req.body.sumber === 'manual' && req.body.siswaManual?.length > 0)
+  ? req.body.siswaManual
+  : bacaSiswa();
 
     // Baca template
     const templatePath = path.join(__dirname, 'templates', 'daftar-hadir.html');
