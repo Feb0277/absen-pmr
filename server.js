@@ -100,9 +100,9 @@ app.post('/generate-pdf', async (req, res) => {
 
     // Baris siswa
     const barisSiswa = dataSiswa.map((s, i) => {
-      const checkboxes = tanggal
-        .map(() => `<td><span class="checkbox"></span></td>`)
-        .join('');
+      const checkboxes = tanggal.map((_, k) =>
+  `<td><span class="checkbox">${s.checks[k] ? '✔' : ''}</span></td>`
+).join('');
       return `
         <tr>
           <td>${i + 1}</td>
