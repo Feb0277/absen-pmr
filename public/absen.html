@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi PMR</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial; background:#f0f4f8; color:#222; }
+
+    /* HEADER */
+    .header {
+      background:#4472c4; color:#fff;
+      padding:14px 16px; text-align:center;
+      position:sticky; top:0; z-index:10;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    }
+    .header h1 { font-size:16px; }
+    .header p  { font-size:10px; opacity:0.8; margin-top:2px; }
+
+    .container { padding:12px; max-width:500px; margin:0 auto; }
+
+    /* CARD */
+    .card {
+      background:#fff; border-radius:10px;
+      padding:14px; margin-bottom:12px;
+      box-shadow:0 1px 6px rgba(0,0,0,0.08);
+    }
+    .card h3 { font-size:12px; color:#4472c4; margin-bottom:10px; font-weight:bold; }
+
+    label { font-size:11px; font-weight:bold; color:#555; display:block; margin-top:8px; }
+    input[type="text"], input[type="date"] {
+      width:100%; padding:9px 10px; margin-top:3px;
+      border:1px solid #ddd; border-radius:8px;
+      font-size:13px; background:#fafafa;
+    }
+    input:focus { outline:none; border-color:#4472c4; background:#fff; }
+
+    /* TANGGAL GRID */
+    .tgl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .tgl-item label { font-size:10px; }
+
+    /* SISWA LIST */
+    .siswa-card {
+      background:#fff; border-radius:10px;
+      margin-bottom:10px;
+      box-shadow:0 1px 6px rgba(0,0,0,0.07);
+      overflow:hidden;
+    }
+    .siswa-header {
+      padding:10px 14px;
+      background:#f8f9ff;
+      border-bottom:1px solid #eee;
+    }
+    .siswa-nama { font-size:13px; font-weight:bold; color:#222; }
+    .siswa-sub  { font-size:10px; color:#888; margin-top:1px; }
+
+    .siswa-checks { padding:10px 14px; }
+    .checks-label { font-size:10px; color:#888; margin-bottom:6px; }
+
+    .check-grid { display:grid; gap:6px; }
+
+    .check-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:8px 10px; border-radius:8px;
+      border:1.5px solid #e0e0e0; background:#fafafa;
+      cursor:pointer; transition:0.15s; user-select:none;
+    }
+    .check-item.hadir {
+      border-color:#4472c4; background:#eef2ff;
+    }
+    .check-item span { font-size:12px; color:#444; }
+    .check-item.hadir span { color:#2f5496; font-weight:bold; }
+
+    .check-box {
+      width:22px; height:22px;
+      border-radius:6px; border:2px solid #ccc;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; color:#fff; background:#fff;
+      transition:0.15s; flex-shrink:0;
+    }
+    .check-item.hadir .check-box {
+      background:#4472c4; border-color:#4472c4;
+    }
+
+    /* LOADING */
+    .loading { text-align:center; padding:30px; color:#888; font-size:13px; }
+
+    /* TOMBOL DOWNLOAD */
+    .btn-download {
+      position:fixed; bottom:0; left:0; right:0;
+      padding:14px 20px;
+      background:#375623; color:#fff;
+      border:none; font-size:15px; font-weight:bold;
+      cursor:pointer; z-index:20;
+      box-shadow:0 -2px 10px rgba(0,0,0,0.15);
+      transition:0.2s;
+    }
+    .btn-download:hover   { background:#1f3714; }
+    .btn-download:disabled { background:#aaa; cursor:not-allowed; }
+
+    /* Status */
+    .status-bar {
+      position:fixed; bottom:56px; left:0; right:0;
+      text-align:center; padding:8px;
+      font-size:12px; font-weight:bold;
+      display:none; z-index:19;
+    }
+    .status-bar.ok  { background:#f0faf0; color:#375623; display:block; }
+    .status-bar.err { background:#fff0f0; color:#c00000; display:block; }
+
+    /* Padding bawah agar konten tidak tertutup tombol */
+    .bottom-space { height:80px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 Absensi PMR — SMK Negeri 1 Stabat</h1>
+  <p id="hdrInfo">Memuat data...</p>
+</div>
+
+<div class="container">
+
+  <!-- PENGATURAN -->
+  <div class="card">
+    <h3>⚙️ Pengaturan</h3>
+    <label>Nama Pelatih</label>
+    <input type="text" id="pelatih" value="Susianto">
+    <label>Tahun Pelajaran</label>
+    <input type="text" id="tahun" value="2025-2026">
+  </div>
+
+  <!-- TANGGAL -->
+  <div class="card">
+    <h3>📅 Tanggal Pertemuan</h3>
+    <div class="tgl-grid" id="tglGrid">
+      <div class="tgl-item">
+        <label>Pertemuan 1</label>
+        <input type="date" class="tgl-input">
+      </div>
+      <div class="tgl-item">
+        <label>Pertemuan 2</label>
+        <input type="date" class="tgl-input">
+      </div>
+      <div class="tgl-item">
+        <label>Pertemuan 3</label>
+        <input type="date" class="tgl-input">
+      </div>
+      <div class="tgl-item">
+        <label>Pertemuan 4</label>
+        <input type="date" class="tgl-input">
+      </div>
+    </div>
+  </div>
+
+  <!-- DAFTAR SISWA + ABSEN -->
+  <div class="card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;">
+    <div style="padding:0 0 8px 0;">
+      <span style="font-size:12px; font-weight:bold; color:#4472c4;">👥 Daftar Absensi</span>
+    </div>
+    <div id="listAbsen"><div class="loading">⏳ Memuat data siswa...</div></div>
+  </div>
+
+  <div class="bottom-space"></div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar" id="statusBar"></div>
+
+<!-- TOMBOL DOWNLOAD -->
+<button class="btn-download" id="btnDownload" onclick="downloadPDF()">
+  ⬇️ Download PDF Daftar Hadir
+</button>
+
+<script>
+  let dataSiswa  = [];
+  let checkState = {}; // { nisn: [true, false, true, false] }
+
+  // ===== LOAD SISWA =====
+  async function loadSiswa() {
+    try {
+      const res  = await fetch('/api/siswa');
+      dataSiswa  = await res.json();
+
+      document.getElementById('hdrInfo').textContent =
+        `${dataSiswa.length} siswa terdaftar`;
+
+      // Init checkState
+      dataSiswa.forEach(s => {
+        checkState[s.nisn] = [false, false, false, false];
+      });
+
+      renderAbsen();
+    } catch(e) {
+      document.getElementById('listAbsen').innerHTML =
+        '<div class="loading">❌ Gagal memuat data siswa.</div>';
+    }
+  }
+
+  // ===== RENDER ABSEN =====
+  function renderAbsen() {
+    const container = document.getElementById('listAbsen');
+    if (dataSiswa.length === 0) {
+      container.innerHTML = '<div class="loading">Belum ada data siswa.</div>';
+      return;
+    }
+
+    container.innerHTML = dataSiswa.map((s, si) => `
+      <div class="siswa-card">
+        <div class="siswa-header">
+          <div class="siswa-nama">${si + 1}. ${s.nama}</div>
+          <div class="siswa-sub">${s.nisn} &bull; ${s.kelas}</div>
+        </div>
+        <div class="siswa-checks">
+          <div class="checks-label">Centang tanggal kehadiran:</div>
+          <div class="check-grid" id="checks-${s.nisn}">
+            ${renderCheckItems(s.nisn)}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderCheckItems(nisn) {
+    const inputs = document.querySelectorAll('.tgl-input');
+    return Array.from({length: 4}, (_, i) => {
+      const tgl    = inputs[i]?.value || `Pertemuan ${i + 1}`;
+      const label  = tgl ? formatTgl(tgl) : `Pertemuan ${i + 1}`;
+      const hadir  = checkState[nisn]?.[i] || false;
+      return `
+        <div class="check-item ${hadir ? 'hadir' : ''}"
+             onclick="toggleCheck('${nisn}', ${i}, this)">
+          <span>${label}</span>
+          <div class="check-box">${hadir ? '✔' : ''}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ===== TOGGLE CHECK =====
+  function toggleCheck(nisn, idx, el) {
+    checkState[nisn][idx] = !checkState[nisn][idx];
+    const hadir = checkState[nisn][idx];
+    el.classList.toggle('hadir', hadir);
+    el.querySelector('.check-box').textContent = hadir ? '✔' : '';
+  }
+
+  // ===== FORMAT TANGGAL =====
+  function formatTgl(str) {
+    if (!str || !str.includes('-')) return str;
+    const [y, m, d] = str.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  // Update label check saat tanggal diubah
+  document.querySelectorAll('.tgl-input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      if (dataSiswa.length > 0) renderAbsen();
+    });
+  });
+
+  // ===== DOWNLOAD PDF =====
+  async function downloadPDF() {
+    const btn    = document.getElementById('btnDownload');
+    const status = document.getElementById('statusBar');
+    btn.disabled = true;
+
+    const tanggal = Array.from(document.querySelectorAll('.tgl-input'))
+      .map(i => i.value).filter(t => t);
+
+    if (tanggal.length === 0) {
+      tampilStatus('❌ Isi minimal 1 tanggal pertemuan!', 'err');
+      btn.disabled = false;
+      return;
+    }
+
+    tampilStatus('⏳ Sedang membuat PDF...', 'ok');
+
+    // Kirim data absensi (siswa + centang)
+    const absensi = dataSiswa.map(s => ({
+      nisn  : s.nisn,
+      nama  : s.nama,
+      kelas : s.kelas,
+      checks: checkState[s.nisn] || []
+    }));
+
+    try {
+      const res = await fetch('/generate-pdf-absen', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({
+          pelatih : document.getElementById('pelatih').value,
+          tahun   : document.getElementById('tahun').value,
+          tanggal,
+          absensi
+        })
+      });
+
+      if (!res.ok) throw new Error('Gagal');
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = 'daftar-hadir-pmr.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      tampilStatus('✅ PDF berhasil didownload!', 'ok');
+    } catch(e) {
+      tampilStatus('❌ Gagal membuat PDF.', 'err');
+    }
+
+    btn.disabled = false;
+  }
+
+  function tampilStatus(pesan, tipe) {
+    const el = document.getElementById('statusBar');
+    el.textContent  = pesan;
+    el.className    = `status-bar ${tipe}`;
+    setTimeout(() => { el.className = 'status-bar'; }, 4000);
+  }
+
+  loadSiswa();
+</script>
+</body>
+</html>

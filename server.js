@@ -152,6 +152,71 @@ app.post('/generate-pdf', async (req, res) => {
   }
 });
 
+// ===== GENERATE PDF ABSEN (dari absen.html) =====
+app.post('/generate-pdf-absen', async (req, res) => {
+  try {
+    const { pelatih, tahun, tanggal, absensi } = req.body;
+
+    const templatePath = path.join(__dirname, 'templates', 'daftar-hadir.html');
+    let html = fs.readFileSync(templatePath, 'utf8');
+
+    // Header tanggal
+    const headerTanggal = tanggal
+      .map(t => `<th>${formatTgl(t)}</th>`)
+      .join('');
+
+    // Baris siswa dengan data centang dari absen.html
+    const barisSiswa = absensi.map((s, i) => {
+      const checkboxes = tanggal.map((_, k) =>
+        `<td><span class="checkbox">${s.checks[k] ? '✔' : ''}</span></td>`
+      ).join('');
+      return `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${s.nisn}</td>
+          <td class="td-nama">${s.nama}</td>
+          <td>${s.kelas}</td>
+          ${checkboxes}
+        </tr>`;
+    }).join('');
+
+    html = html
+      .replace('{{logo}}',          logoBase64)
+      .replace('{{tahun}}',         tahun)
+      .replace('{{pelatih}}',       pelatih)
+      .replace('{{jumlahTanggal}}', tanggal.length)
+      .replace('{{headerTanggal}}', headerTanggal)
+      .replace('{{barisSiswa}}',    barisSiswa);
+
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--allow-file-access-from-files', '--disable-web-security', '--no-sandbox']
+    });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    const pdf = await page.pdf({
+      format         : 'A4',
+      landscape      : true,
+      printBackground: true,
+      margin         : { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' }
+    });
+
+    await browser.close();
+
+    res.set({
+      'Content-Type'       : 'application/pdf',
+      'Content-Disposition': 'attachment; filename=daftar-hadir-pmr.pdf'
+    });
+    res.send(pdf);
+    console.log('✅ PDF Absen berhasil digenerate!');
+
+  } catch(err) {
+    console.error('❌ Error:', err.message);
+    res.status(500).send('Gagal generate PDF');
+  }
+});
+
 app.get('/ping', (req, res) => res.send('✅ Server Absen PMR berjalan!'));
 
 const PORT = process.env.PORT || 3000;
